@@ -339,6 +339,7 @@ st.markdown("""
             """)
 st.divider()
 st.markdown("## Parameter")
+st.image('notasigaya.png',caption="Notasi Arah Gaya")
 st.markdown("### Material")
 st.markdown(MD_PARAMETER_MATERIAL)
 st.markdown("### Penampang")
