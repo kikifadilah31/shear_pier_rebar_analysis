@@ -379,7 +379,7 @@ with col_A1:
     column_A(ARAH_X,ratio_pier_x_column_latex,ratio_pier_x_column,"L")
 with col_A2:
     column_A(ARAH_X,ratio_pier_y_column_latex,ratio_pier_y_column,"B")
-
+### CEK KEBUTUHAN TULANGAN GESER -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 st.markdown("### Analisis Kebutuhan Tulangan Geser")
 st.markdown(f"- Tinggi bidang geser efektif, $d_v$ :")
 col_B1,col_B2 = st.columns(2)
@@ -396,6 +396,7 @@ with col_B2:
         st.info(f" - $d_{{v_{{{ARAH_Y}}}}} = {d_v_y} \ mm$")
 
 st.markdown(f"- Faktor indikasi, $\beta = {beta}$")
+### CEK AXIAL -------------------------------------------------------
 st.markdown(f"- Cek apakah $P_u > 0.1 A_g f_c$ :")
 with st.expander("Lihat Penjelasan"):
     st.markdown("Untuk gaya tekan kurang dari $0.1 A_g f_c$, $Vc$ diambil nilai yang turun secara linier dari nilai pada **Persamaan 20 SNI:2833-2016** hingga nol pada gaya tekan sama dengan nol.")
@@ -407,7 +408,7 @@ elif P_u < (0.1*A_g*f_c):
     st.warning(f"$P_u={P_u/1000}\ kN < 0.1 A_g f_c = {(0.1*A_g*f_c)/1000} \ kN$ Kapasitas geser beton $V_c$ direduksi")
     st.markdown(f"- Faktor reduksi kapasitas geser beton :")
     st.latex(phi_V_c_latex)
-
+### CEK KAPASITAS GESER BETON --------------------------------------------------
 st.markdown(f"- Kapasitas geser beton,$V_c$ :")
 def column_C(arah,V_c_latex,V_c):
     with st.container(border=True):
@@ -522,6 +523,8 @@ def column_H(arah,V_r_latex,V_r,V_u):
         st.latex(V_r_latex)
         if V_r >= V_u:
             st.success(f"$V_r = {(V_r/1000)} \ kN \geq {V_u/1000} \ kN$")
+        elif V_r <= V_u:
+            st.error(f"$V_r = {(V_r/1000)} \ kN \leq {V_u/1000} \ kN$")
     
 col_H1,col_H2 = st.columns(2)
 with col_H1:
@@ -544,44 +547,59 @@ if zona_geser == "Sendi Plastis":
         column_I(ARAH_Y,A_sh_y_latex,A_sh_y)
 
 st.markdown("### Resume Tulangan")
-A_v_wall_x = (A_v_x/2)/(H/S_v)
-A_v_wall_y = (A_v_y/2)/(H/S_v)
-N_v_x = max(A_v_x,A_v_min_x,A_sh_x)/(0.25*pi*D_v**2)
-N_v_y = max(A_v_y,A_v_min_y,A_sh_y)/(0.25*pi*D_v**2)
-N_v_wall_x = max(A_v_wall_x,A_v_min_x,A_sh_x)/(0.25*pi*D_v**2)
-N_v_wall_y = max(A_v_wall_x,A_v_min_y,A_sh_y)/(0.25*pi*D_v**2)
-st.markdown("Dari hasil analisis dapat disimpulkan tulangan geser yang harus dipasang pada pier adalah sebagai berikut :")
-def MD_RESUME_PIER_COLUMN(arah,A_v,A_v_min,A_sh,N_v):
-    (f"""
-        - Kebutuhan tulangan geser {arah} adalah **{round(A_v)} mm2** 
-        - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
-        - Kebutuhan luas tulangan confinement {arah} adalah **{round(A_sh)} mm2**
-        - Maka luas tulangan yang harus dipasang arah {arah} adalah **{max(A_v,A_v_min,A_sh)} mm2**
-        - Konfigurasi yang digunakan adalah **{ceil(N_v)}D{D_v}-{S_v}**
-        """)
+luas_tulangan_pier_wall_X = (A_v_x)/(H/S_v)
+luas_tulangan_pier_wall_Y = (A_v_y)/(H/S_v)
 
-def MD_RESUME_PIER_WALL(arah,A_v,A_v_min,A_sh,N_v):
-    (f"""
-        - Kebutuhan tulangan geser {arah} adalah **{round(A_v)} mm2**
-        - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
-        - Kebutuhan luas tulangan confinement {arah} adalah **{round(A_sh)} mm2**
-        - Maka luas tulangan yang harus dipasang arah {arah} adalah **{max(A_v,A_v_min,A_sh)} mm2**
-        - Konfigurasi yang digunakan adalah **{ceil(N_v)}D{D_v}-{S_v}**
-        """)
+def jumlah_tulangan_pier(A_v,A_v_min,A_sh):
+    if zona_geser == "Sendi Plastis":
+        N_v=max(A_v,A_v_min,A_sh)/(0.25*pi*D_v**2)
+    if zona_geser == "Luar Sendi Plastis":
+        N_v=max(A_v,A_v_min)/(0.25*pi*D_v**2)
+    return N_v
+
+def jumlah_tulangan_pier_wall(A_v_wall,A_v_min,A_sh):
+    if zona_geser == "Sendi Plastis":
+        N_v=max(A_v_wall,A_v_min,A_sh)/(0.25*pi*D_v**2)
+    if zona_geser == "Luar Sendi Plastis":
+        N_v=max(A_v_wall,A_v_min)/(0.25*pi*D_v**2)
+    return N_v
+
+jumlah_tulangan_pier_X= jumlah_tulangan_pier(A_v_x,A_v_min_x,A_sh_x)
+jumlah_tulangan_pier_Y= jumlah_tulangan_pier(A_v_y,A_v_min_y,A_sh_y)
+jumlah_tulangan_pier_wall_X=jumlah_tulangan_pier_wall(luas_tulangan_pier_wall_X,A_v_min_x,A_sh_x)
+jumlah_tulangan_pier_wall_Y=jumlah_tulangan_pier_wall(luas_tulangan_pier_wall_Y,A_v_min_y,A_sh_y)
+
+st.markdown("Dari hasil analisis dapat disimpulkan tulangan geser yang harus dipasang pada pier adalah sebagai berikut :")
+def MD_RESUME_PIER(arah,A_v,A_v_min,A_sh,N_v):
+    if zona_geser == "Sendi Plastis":
+        (f"""
+            - Kebutuhan tulangan geser {arah} adalah **{round(A_v)} mm2** 
+            - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
+            - Kebutuhan luas tulangan confinement {arah} adalah **{round(A_sh)} mm2**
+            - Maka luas tulangan yang harus dipasang arah {arah} adalah **{round(max(A_v,A_v_min,A_sh))} mm2**
+            - Konfigurasi yang digunakan adalah **{ceil(N_v)}D{D_v}-{S_v}**
+            """)
+    if zona_geser == "Luar Sendi Plastis":
+        (f"""
+            - Kebutuhan tulangan geser {arah} adalah **{round(A_v)} mm2** 
+            - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
+            - Maka luas tulangan yang harus dipasang arah {arah} adalah **{round(max(A_v,A_v_min))} mm2**
+            - Konfigurasi yang digunakan adalah **{ceil(N_v)}D{D_v}-{S_v}**
+            """)
 
 col_J1,col_J2 = st.columns(2)
 with col_J1:
     with st.container(border=True):
         st.markdown(f"**Arah {ARAH_X}**")
         if ratio_pier_x_column > 2.5:
-            st.markdown(MD_RESUME_PIER_COLUMN(ARAH_X,A_v_x,A_v_min_x,A_sh_x,N_v_x))
+            st.markdown(MD_RESUME_PIER(ARAH_X,A_v_x,A_v_min_x,A_sh_x,jumlah_tulangan_pier_X))
         elif ratio_pier_x_column < 2.5:
-            st.markdown(MD_RESUME_PIER_WALL(ARAH_X,A_v_wall_x,A_v_min_x,A_sh_x,N_v_wall_x))
+            st.markdown(MD_RESUME_PIER(ARAH_X,luas_tulangan_pier_wall_X,A_v_min_x,A_sh_x,jumlah_tulangan_pier_wall_X))
 
 with col_J2:
     with st.container(border=True):
         st.markdown(f"**Arah {ARAH_Y}**")
-        if ratio_pier_y_column > 2.5:
-            st.markdown(MD_RESUME_PIER_COLUMN(ARAH_Y,A_v_y,A_v_min_y,A_sh_y,N_v_y))
-        elif ratio_pier_y_column < 2.5:
-            st.markdown(MD_RESUME_PIER_WALL(ARAH_Y,A_v_wall_y,A_v_min_y,A_sh_y,N_v_wall_y))
+        if ratio_pier_x_column > 2.5:
+            st.markdown(MD_RESUME_PIER(ARAH_Y,A_v_y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_Y))
+        elif ratio_pier_x_column < 2.5:
+            st.markdown(MD_RESUME_PIER(ARAH_Y,luas_tulangan_pier_wall_Y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_wall_Y))
