@@ -59,15 +59,20 @@ with st.sidebar:
     shear_rebar_diameter = st.number_input("Diameter Tulangan Sengkang (mm)",
                                            value=19)
     shear_rebar_ratio_X = st.number_input("Rasio Tulangan Geser Pier Wall Arah X",
-                                        help="Rasio Tulangan Geser untuk type dinding",
-                                        value=0.002)
+                                        help="Rasio Tulangan Geser untuk type dinding, ratio minimum 0.0018",
+                                        value=0.002,
+                                        step=0.001,
+                                        format="%.4f")
     shear_rebar_ratio_Y = st.number_input("Rasio Tulangan Geser Pier Wall Arah Y",
-                                        help="Rasio Tulangan Geser untuk type dinding",
-                                        value=0.002)
+                                        help="Rasio Tulangan Geser untuk type dinding, ratio minimum 0.0018",
+                                        value=0.002,
+                                        step=0.001,
+                                        format="%.4f")
     st.markdown("## Faktor Reduksi")
     shear_reduction_factor = st.number_input("Faktor Reduksi Kapasitas Geser",
                                              help="0.75 untuk geser",
-                                             value=0.75)
+                                             value=0.75,
+                                             )
 ### PARAMETER UNTUK ANALISIS -------------------------------------------------------------------------------------------------------------------------------------#
 
 f_c = compression_strength_of_concrete
@@ -549,7 +554,6 @@ if zona_geser == "Sendi Plastis":
 st.markdown("### Resume Tulangan")
 luas_tulangan_pier_wall_X = (A_v_x)/(H/S_v)
 luas_tulangan_pier_wall_Y = (A_v_y)/(H/S_v)
-
 def jumlah_tulangan_pier(A_v,A_v_min,A_sh):
     if zona_geser == "Sendi Plastis":
         N_v=max(A_v,A_v_min,A_sh)/(0.25*pi*D_v**2)
@@ -569,37 +573,50 @@ jumlah_tulangan_pier_Y= jumlah_tulangan_pier(A_v_y,A_v_min_y,A_sh_y)
 jumlah_tulangan_pier_wall_X=jumlah_tulangan_pier_wall(luas_tulangan_pier_wall_X,A_v_min_x,A_sh_x)
 jumlah_tulangan_pier_wall_Y=jumlah_tulangan_pier_wall(luas_tulangan_pier_wall_Y,A_v_min_y,A_sh_y)
 
-st.markdown("Dari hasil analisis dapat disimpulkan tulangan geser yang harus dipasang pada pier adalah sebagai berikut :")
-def MD_RESUME_PIER(arah,A_v,A_v_min,A_sh,N_v):
-    if zona_geser == "Sendi Plastis":
-        (f"""
+st.markdown("Dari hasil analisis dapat disimpulkan tulangan geser yang harus dipasang adalah sebagai berikut :")
+def MD_RESUME_PIER(arah,A_v,A_v_min,A_sh,jumlah_tulangan_pier,luas_tulangan_pier_wall,jumlah_tulangan_pier_wall):
+    if ratio_pier_x_column > 2.5: # KALAU PIER KOLOM
+        if zona_geser == "Sendi Plastis": 
+            st.markdown(f"""
             - Kebutuhan tulangan geser {arah} adalah **{round(A_v)} mm2** 
             - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
             - Kebutuhan luas tulangan confinement {arah} adalah **{round(A_sh)} mm2**
             - Maka luas tulangan yang harus dipasang arah {arah} adalah **{round(max(A_v,A_v_min,A_sh))} mm2**
-            - Konfigurasi yang digunakan adalah **{ceil(N_v)}D{D_v}-{S_v}**
+            - Konfigurasi yang digunakan adalah **{ceil(jumlah_tulangan_pier)}D{D_v}-{S_v}**
             """)
-    if zona_geser == "Luar Sendi Plastis":
-        (f"""
+        if zona_geser == "Luar Sendi Plastis":
+            st.markdown(f"""
             - Kebutuhan tulangan geser {arah} adalah **{round(A_v)} mm2** 
             - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
             - Maka luas tulangan yang harus dipasang arah {arah} adalah **{round(max(A_v,A_v_min))} mm2**
-            - Konfigurasi yang digunakan adalah **{ceil(N_v)}D{D_v}-{S_v}**
+            - Konfigurasi yang digunakan adalah **{ceil(jumlah_tulangan_pier)}D{D_v}-{S_v}**
             """)
+    elif ratio_pier_x_column < 2.5: # KALAU PIER WALL
+        if zona_geser == "Sendi Plastis":
+            st.markdown(f"""
+            - Kebutuhan tulangan geser {arah} setelah di bagi dengan spasi adalah **{round(luas_tulangan_pier_wall)} mm2** 
+            - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
+            - Kebutuhan luas tulangan confinement {arah} adalah **{round(A_sh)} mm2**
+            - Maka luas tulangan yang harus dipasang arah {arah} adalah **{round(max(luas_tulangan_pier_wall,A_v_min,A_sh))} mm2**
+            - Konfigurasi yang digunakan adalah **{ceil(jumlah_tulangan_pier_wall)}D{D_v}-{S_v}**
+            """)
+        if zona_geser == "Luar Sendi Plastis":
+            st.markdown(f"""
+            - Kebutuhan tulangan geser {arah} adalah **{round(luas_tulangan_pier_wall)} mm2** 
+            - Kebutuhan luas tulangan minimum {arah} adalah **{round(A_v_min)} mm2**
+            - Maka luas tulangan yang harus dipasang arah {arah} adalah **{round(max(luas_tulangan_pier_wall,A_v_min))} mm2**
+            - Konfigurasi yang digunakan adalah **{ceil(jumlah_tulangan_pier_wall)}D{D_v}-{S_v}**
+            """)
+
+
+
 
 col_J1,col_J2 = st.columns(2)
 with col_J1:
     with st.container(border=True):
         st.markdown(f"**Arah {ARAH_X}**")
-        if ratio_pier_x_column > 2.5:
-            st.markdown(MD_RESUME_PIER(ARAH_X,A_v_x,A_v_min_x,A_sh_x,jumlah_tulangan_pier_X))
-        elif ratio_pier_x_column < 2.5:
-            st.markdown(MD_RESUME_PIER(ARAH_X,luas_tulangan_pier_wall_X,A_v_min_x,A_sh_x,jumlah_tulangan_pier_wall_X))
-
+        MD_RESUME_PIER(ARAH_X,A_v_x,A_v_min_x,A_sh_x,jumlah_tulangan_pier_X,luas_tulangan_pier_wall_X,jumlah_tulangan_pier_wall_X) 
 with col_J2:
     with st.container(border=True):
         st.markdown(f"**Arah {ARAH_Y}**")
-        if ratio_pier_x_column > 2.5:
-            st.markdown(MD_RESUME_PIER(ARAH_Y,A_v_y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_Y))
-        elif ratio_pier_x_column < 2.5:
-            st.markdown(MD_RESUME_PIER(ARAH_Y,luas_tulangan_pier_wall_Y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_wall_Y))
+        MD_RESUME_PIER(ARAH_Y,A_v_y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_Y,luas_tulangan_pier_wall_Y,jumlah_tulangan_pier_wall_Y)
