@@ -1,2 +1,2 @@
 streamlit
-handcalcs
+handcalcs>=1.8.0
