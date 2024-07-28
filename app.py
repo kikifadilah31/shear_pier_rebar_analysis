@@ -544,7 +544,7 @@ if zona_geser == "Sendi Plastis":
         with st.container(border=True):
             st.markdown(f"**Arah {arah}**")
             st.latex(A_sh_latex)
-            st.info(f"$A_{{sh_{{{arah}}}}} = {A_sh} \ mm^{{2}}$")
+            st.info(f"$A_{{sh_{{{arah}}}}} = {round(A_sh)} \ mm^{{2}}$")
 
     col_I1,col_I2 = st.columns(2)
     with col_I1:
