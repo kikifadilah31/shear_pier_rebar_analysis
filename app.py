@@ -575,8 +575,8 @@ jumlah_tulangan_pier_wall_X=jumlah_tulangan_pier_wall(luas_tulangan_pier_wall_X,
 jumlah_tulangan_pier_wall_Y=jumlah_tulangan_pier_wall(luas_tulangan_pier_wall_Y,A_v_min_y,A_sh_y)
 
 st.markdown("Dari hasil analisis dapat disimpulkan tulangan geser yang harus dipasang adalah sebagai berikut :")
-def MD_RESUME_PIER(arah,A_v,A_v_min,A_sh,jumlah_tulangan_pier,luas_tulangan_pier_wall,jumlah_tulangan_pier_wall):
-    if ratio_pier_x_column > 2.5: # KALAU PIER KOLOM
+def MD_RESUME_PIER(arah,ratio_pier_column,A_v,A_v_min,A_sh,jumlah_tulangan_pier,luas_tulangan_pier_wall,jumlah_tulangan_pier_wall):
+    if ratio_pier_column > 2.5: # KALAU PIER KOLOM
         if zona_geser == "Sendi Plastis": 
             st.markdown(f"""
             - Kebutuhan tulangan geser {arah} adalah **{round(A_v)} mm2** 
@@ -592,7 +592,7 @@ def MD_RESUME_PIER(arah,A_v,A_v_min,A_sh,jumlah_tulangan_pier,luas_tulangan_pier
             - Maka luas tulangan yang harus dipasang arah {arah} adalah **{round(max(A_v,A_v_min))} mm2**
             - Konfigurasi yang digunakan adalah **{ceil(jumlah_tulangan_pier)}D{D_v}-{S_v}**
             """)
-    elif ratio_pier_x_column < 2.5: # KALAU PIER WALL
+    elif ratio_pier_column < 2.5: # KALAU PIER WALL
         if zona_geser == "Sendi Plastis":
             st.markdown(f"""
             - Kebutuhan tulangan geser {arah} setelah di bagi dengan spasi adalah **{round(luas_tulangan_pier_wall)} mm2** 
@@ -616,8 +616,8 @@ col_J1,col_J2 = st.columns(2)
 with col_J1:
     with st.container(border=True):
         st.markdown(f"**Arah {ARAH_X}**")
-        MD_RESUME_PIER(ARAH_X,A_v_x,A_v_min_x,A_sh_x,jumlah_tulangan_pier_X,luas_tulangan_pier_wall_X,jumlah_tulangan_pier_wall_X) 
+        MD_RESUME_PIER(ARAH_X,ratio_pier_x_column,A_v_x,A_v_min_x,A_sh_x,jumlah_tulangan_pier_X,luas_tulangan_pier_wall_X,jumlah_tulangan_pier_wall_X) 
 with col_J2:
     with st.container(border=True):
         st.markdown(f"**Arah {ARAH_Y}**")
-        MD_RESUME_PIER(ARAH_Y,A_v_y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_Y,luas_tulangan_pier_wall_Y,jumlah_tulangan_pier_wall_Y)
+        MD_RESUME_PIER(ARAH_Y,ratio_pier_y_column,A_v_y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_Y,luas_tulangan_pier_wall_Y,jumlah_tulangan_pier_wall_Y)
