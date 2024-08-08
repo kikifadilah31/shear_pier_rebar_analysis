@@ -10,10 +10,16 @@ ARAH_Y = "trans"
 with st.sidebar:
     ### INPUT INFORMASI PROYEK ----------------------------------------------------------------------------------------------------------------------------------#
     st.markdown("# Informasi Proyek")
-    project = st.text_input("Nama Proyek",help="Inputkan Nama Proyek")
-    document_code = st.text_input("Kode Dokumen",help="Apabila tidak ada inputkan tanda - ")
-    date = st.date_input("Tanggal Dibuat",help="Masukan Tanggal")
-    pier_number = st.text_input("Nomor Pier",help="Masukan Nomor Pier")
+    project = st.text_input("Nama Proyek",
+                            value="-")
+    document_code = st.text_input("Kode Dokumen",
+                                  help="Apabila tidak ada inputkan tanda - ",
+                                  value="-")
+    date = st.date_input("Tanggal Dibuat",
+                         help="Masukan Tanggal")
+    pier_number = st.text_input("Nomor Pier",
+                             help="Masukan Type Struktur",
+                             value="-")
     ### INPUT PARAMETER -----------------------------------------------------------------------------------------------------------------------------------------#
     st.markdown("# Umum")
     zona_geser = st.radio("Zona Geser",
@@ -344,6 +350,14 @@ st.markdown("""
             - **SE Dirjen Bina Marga No.06/SE/Db/2021** tentang Panduan Praktis Perencanaan Teknis Jembatan
             """)
 st.divider()
+st.markdown("## Informasi Proyek")
+col_IP1,col_IP2=st.columns(2)
+with col_IP1:
+    st.markdown(f"**Proyek : {project}**")
+    st.markdown(f"**Nomor Pier : {pier_number}**")
+with col_IP2:
+    st.markdown(f"**Kode Dokumen : {document_code}**")
+    st.markdown(f"**Tanggal : {date}**")
 st.markdown("## Parameter")
 st.image('notasigaya.png',caption="Notasi Arah Gaya")
 st.markdown("### Material")
@@ -401,7 +415,7 @@ with col_B2:
         st.latex(d_v_y_latex)
         st.info(f" - $d_{{v_{{{ARAH_Y}}}}} = {d_v_y} \ mm$")
 
-st.markdown(f"- Faktor indikasi, $\beta = {beta}$")
+st.markdown(f"- Faktor indikasi, $\\beta = {beta}$")
 ### CEK AXIAL -------------------------------------------------------
 st.markdown(f"- Cek apakah $P_u > 0.1 A_g f_c$ :")
 with st.expander("Lihat Penjelasan"):
