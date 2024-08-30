@@ -79,6 +79,7 @@ with st.sidebar:
                                              help="0.75 untuk geser",
                                              value=0.75,
                                              )
+    st.markdown('<div style="text-align: center;">Dikembangkan Oleh : Kiki Fadilah Tanjung</div>', unsafe_allow_html=True)
 ### PARAMETER UNTUK ANALISIS -------------------------------------------------------------------------------------------------------------------------------------#
 
 f_c = compression_strength_of_concrete
@@ -635,3 +636,7 @@ with col_J2:
     with st.container(border=True):
         st.markdown(f"**Arah {ARAH_Y}**")
         MD_RESUME_PIER(ARAH_Y,ratio_pier_y_column,A_v_y,A_v_min_y,A_sh_y,jumlah_tulangan_pier_Y,luas_tulangan_pier_wall_Y,jumlah_tulangan_pier_wall_Y)
+
+
+with st.container(border=True):
+    st.markdown("https://www.linkedin.com/in/kiki-fadilah-tanjung-88460b151/")
